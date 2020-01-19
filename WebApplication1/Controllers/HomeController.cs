@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ICSharpCode.SharpZipLib.Zip;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,10 +14,76 @@ namespace WebApplication1.Controllers
     {
         public ActionResult Index()
         {
-
-            write1();
+            string TorepotFiles = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\按机构导出文件_C59.F19.P11_浙江省人民政府20200119100455.zip";
+            string reportPath = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\备份\新建文件夹";
+            UnzipTheFiles(TorepotFiles, reportPath);
             return View();
         }
+
+        /// <summary>
+        /// 解压文件 1.01
+        /// </summary>
+        ///<param name = "ZipPath" > 需要被解压的文件 </ param >
+        /// <param name="Path">解压后文件的路径</param>
+        public string UnzipTheFiles(string TorepotFiles, string reportPath)
+        {
+            
+            ZipInputStream s = new ZipInputStream(System.IO.File.OpenRead(TorepotFiles));
+
+            ZipEntry theEntry;
+            try
+            {
+                while ((theEntry = s.GetNextEntry()) != null)
+                {
+                    string fileName = System.IO.Path.GetFileName(theEntry.Name);
+                    //生成解压目录
+                    Directory.CreateDirectory(reportPath);
+
+                    if (fileName != String.Empty)
+                    {
+                        //解压文件
+                        FileStream streamWriter = System.IO.File.Create(reportPath + @"\测试路径无"+fileName);
+                       
+
+                        int size = 2048;
+                        byte[] data = new byte[2048];
+                        while (true)
+                        {
+                            size = s.Read(data, 0, data.Length);
+                            if (size > 0)
+                            {
+                                streamWriter.Write(data, 0, size);
+                            }
+                            else
+                            {
+
+                                streamWriter.Close();
+                                streamWriter.Dispose();
+                                break;
+                            }
+                        }
+
+                        streamWriter.Close();
+                        streamWriter.Dispose();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+              
+                throw ex;
+            }
+            finally
+            {
+                s.Close();
+                s.Dispose();
+            }
+
+            return reportPath;
+        }
+
+
+
 
         /// <summary>
         /// 读取xml文件 1.0
