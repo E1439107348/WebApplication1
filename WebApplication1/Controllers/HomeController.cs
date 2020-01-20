@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
+using WebApplication1.Models;
 
 namespace WebApplication1.Controllers
 {
@@ -14,9 +15,30 @@ namespace WebApplication1.Controllers
     {
         public ActionResult Index()
         {
-            string TorepotFiles = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\按机构导出文件_C59.F19.P11_浙江省人民政府20200119100455.zip";
-            string reportPath = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\备份\新建文件夹";
-            UnzipTheFiles(TorepotFiles, reportPath);
+            //string TorepotFiles = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\按机构导出文件_C59.F19.P11_浙江省人民政府20200119100455.zip";
+            //string reportPath = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\备份\新建文件夹";
+            //UnzipTheFiles(TorepotFiles, reportPath);
+            using (MYDBContext db = new MYDBContext())
+            {
+
+                try
+                {
+
+
+
+                    //string SQLStr = string.Format("insert into   UserTS VALUES('{0}', '{1}')", Guid.NewGuid().ToString(), DateTime.Now.ToString());
+
+
+                    string SQLStr = string.Format("INSERT INTO code_value(CODE_VALUE_SEQ, CODE_TYPE, CODE_COLUMN_NAME, CODE_LEVEL, CODE_VALUE, ININO, SUB_CODE_VALUE, CODE_NAME, CODE_NAME2, CODE_NAME3, CODE_REMARK, CODE_SPELLING, ISCUSTOMIZE, CODE_ASSIST, CODE_STATUS, CODE_LEAF, START_DATE, STOP_DATE) VALUES (9999, 'ZB79', NULL, NULL, '1', NULL, '-1', '领导班子换届考察1', '1', '领导班子换届考察1', NULL, 'LDBZHJKC', '0', NULL, '1', '1', NULL, NULL)");
+                    db.Database.ExecuteSqlCommand(SQLStr);
+                }
+                catch (Exception ex) 
+                
+                {
+                    var ts = ex.ToString();
+                    throw; }
+            }
+
             return View();
         }
 
