@@ -16,9 +16,7 @@ namespace WebApplication1.Controllers
         public ActionResult Index()
         {
 
-
-            ReadXml1();
-            return View();
+           
             //string TorepotFiles = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\按机构导出文件_C59.F19.P11_浙江省人民政府20200119100455.zip";
             //string reportPath = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\备份\新建文件夹";
             //UnzipTheFiles(TorepotFiles, reportPath);
@@ -46,6 +44,14 @@ namespace WebApplication1.Controllers
 
             return View();
         }
+
+
+        #region 修改中内容
+
+
+        #endregion
+
+
 
         /// <summary>
         /// 解压文件 1.01
@@ -153,9 +159,9 @@ namespace WebApplication1.Controllers
         }
 
         /// <summary>
-        /// 2.1写入xml 1.0
+        /// 2.1写入xml   单节点模式 1.0
         /// </summary>
-        public void Write()
+        public void WriteOne()
         {
             var xmlDoc = new XmlDocument();
             //Create the xml declaration first 
@@ -174,13 +180,19 @@ namespace WebApplication1.Controllers
             value.Value = "测试";
             elementContact.Attributes.Append(value);
             el.AppendChild(elementContact);
-            xmlDoc.Save(@"K:\test1.xml");
+            xmlDoc.Save(@"K:\write1.xml");
+
+            //输出格式
+            //        <? xml version = "1.0" encoding = "utf-8" ?>
+            //< Contacts > 
+            //  < Contact id = "01" value = "测试" />
+            //   </ Contacts >
         }
 
         /// <summary>
-        /// 2.2写入xml第二种方式 1.0
+        /// 2.2写入xml 父节点 ，子节点 第二种方式 1.0
         /// </summary>
-        public void write1()
+        public void WritePs()
         {
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.AppendChild(xmlDocument.CreateXmlDeclaration("1.0", "UTF-8", null));
@@ -194,8 +206,6 @@ namespace WebApplication1.Controllers
             xmlElementInner01.Attributes.SetNamedItem(xmlAttribute01);
             xmlRoot.AppendChild(xmlElementInner01);
 
-
-
             //第二节点
             XmlElement xmlChild = xmlDocument.CreateElement("data2");
             //第二子节点
@@ -206,16 +216,103 @@ namespace WebApplication1.Controllers
             xmlChild.AppendChild(xmlElementInner);
             xmlRoot.AppendChild(xmlChild);
 
+            xmlDocument.Save(@"K:\write2.xml");
 
 
+            //写入格式
+            //         <? xml version = "1.0" encoding = "UTF-8" ?>
+            //< data1 > 
+            //  < root 我是键 = "我是值" /> 
+            //  < data2 > 
+            //    < root 我是键 = "我是值" /> 
+            //   </ data2 >
+            // </ data1 >
+        }
 
 
+        /// <summary>
+        /// 2.3写入xml第二种方式  父子节点（通过父节点判断，获取子节点数据） 1.0
+        /// </summary>
+        public void writeNodeP()
+        {
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.AppendChild(xmlDocument.CreateXmlDeclaration("1.0", "UTF-8", null));
+            //第一节点
+            XmlElement xmlRoot = xmlDocument.CreateElement("root");
+            xmlDocument.AppendChild(xmlRoot);
+
+            //第二节点
+            XmlElement xmlChild = xmlDocument.CreateElement("items");
+            XmlAttribute xmlChildKey = xmlDocument.CreateAttribute("name");
+            xmlChildKey.Value = "01";
+            xmlChild.Attributes.SetNamedItem(xmlChildKey);
+
+            //第二子节点
+            XmlElement xmlElementInner = xmlDocument.CreateElement("item");
+            //第二子节点 键1
+            XmlAttribute node1 = xmlDocument.CreateAttribute("key");
+            node1.Value = "key1";
+            xmlElementInner.Attributes.SetNamedItem(node1);
+            xmlChild.AppendChild(xmlElementInner);
+
+            //第二子节点 键2
+            XmlAttribute node2 = xmlDocument.CreateAttribute("value");
+            node2.Value = "value";
+            xmlElementInner.Attributes.SetNamedItem(node2);
+            xmlChild.AppendChild(xmlElementInner);
+
+            xmlRoot.AppendChild(xmlChild);
+            xmlDocument.Save(@"K:\write3.xml");
 
 
+//输出格式
+   //         <? xml version = "1.0" encoding = "UTF-8" ?>
+   //< root >
+   //  < items name = "01" >
+   //    < item key = "key1" value = "value" />
+   //     </ items >
+   //   </ root >
 
-            xmlDocument.Save(@"K:\XMLConfig.xml");
         }
         #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public static void xml()
         {
