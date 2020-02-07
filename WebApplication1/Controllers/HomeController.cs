@@ -15,6 +15,10 @@ namespace WebApplication1.Controllers
     {
         public ActionResult Index()
         {
+
+
+            ReadXml1();
+            return View();
             //string TorepotFiles = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\按机构导出文件_C59.F19.P11_浙江省人民政府20200119100455.zip";
             //string reportPath = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\备份\新建文件夹";
             //UnzipTheFiles(TorepotFiles, reportPath);
@@ -32,11 +36,12 @@ namespace WebApplication1.Controllers
                     string SQLStr = string.Format("INSERT INTO code_value(CODE_VALUE_SEQ, CODE_TYPE, CODE_COLUMN_NAME, CODE_LEVEL, CODE_VALUE, ININO, SUB_CODE_VALUE, CODE_NAME, CODE_NAME2, CODE_NAME3, CODE_REMARK, CODE_SPELLING, ISCUSTOMIZE, CODE_ASSIST, CODE_STATUS, CODE_LEAF, START_DATE, STOP_DATE) VALUES (9999, 'ZB79', NULL, NULL, '1', NULL, '-1', '领导班子换届考察1', '1', '领导班子换届考察1', NULL, 'LDBZHJKC', '0', NULL, '1', '1', NULL, NULL)");
                     db.Database.ExecuteSqlCommand(SQLStr);
                 }
-                catch (Exception ex) 
-                
+                catch (Exception ex)
+
                 {
                     var ts = ex.ToString();
-                    throw; }
+                    throw;
+                }
             }
 
             return View();
@@ -49,7 +54,7 @@ namespace WebApplication1.Controllers
         /// <param name="Path">解压后文件的路径</param>
         public string UnzipTheFiles(string TorepotFiles, string reportPath)
         {
-            
+
             ZipInputStream s = new ZipInputStream(System.IO.File.OpenRead(TorepotFiles));
 
             ZipEntry theEntry;
@@ -64,8 +69,8 @@ namespace WebApplication1.Controllers
                     if (fileName != String.Empty)
                     {
                         //解压文件
-                        FileStream streamWriter = System.IO.File.Create(reportPath + @"\测试路径无"+fileName);
-                       
+                        FileStream streamWriter = System.IO.File.Create(reportPath + @"\测试路径无" + fileName);
+
 
                         int size = 2048;
                         byte[] data = new byte[2048];
@@ -92,7 +97,7 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
-              
+
                 throw ex;
             }
             finally
@@ -105,10 +110,10 @@ namespace WebApplication1.Controllers
         }
 
 
-
+        #region 读写xml
 
         /// <summary>
-        /// 读取xml文件 1.0
+        ///1.1 读取xml文件 1.0
         /// </summary>
         public void ReadXml()
         {
@@ -119,8 +124,36 @@ namespace WebApplication1.Controllers
             var ts22 = ts.Attributes("B0104").First().Value;
         }
 
+
+        public void ReadXml1()
+        {
+            var xml = XDocument.Load(Server.MapPath("~/xml/PageIndex.xml"));
+            try
+            {
+                //获取指定的一级节点
+                var firstNode = xml.Root.Elements("items").First(x => x.Attribute("name").Value == "01");
+                //获取一级节点下的所有子节点
+                var nodes = new List<XElement>();
+                firstNode.Elements("item").ToList().ForEach(x =>
+                {
+                    nodes.Add(x);
+                    nodes = nodes.Union(x.Elements("item").ToList()).ToList();
+                });
+                int num = nodes.Count();//所有子节点的数量
+                var node = nodes.ElementAt(0);//获取指定子节点
+                var key = node.Attribute("Key").Value;//获取专属变量
+                var value = node.Attribute("value").Value;
+
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         /// <summary>
-        /// 写入xml 1.0
+        /// 2.1写入xml 1.0
         /// </summary>
         public void Write()
         {
@@ -143,9 +176,9 @@ namespace WebApplication1.Controllers
             el.AppendChild(elementContact);
             xmlDoc.Save(@"K:\test1.xml");
         }
-        #region 读写xml
+
         /// <summary>
-        /// 写入xml第二种方式 1.0
+        /// 2.2写入xml第二种方式 1.0
         /// </summary>
         public void write1()
         {
@@ -164,7 +197,7 @@ namespace WebApplication1.Controllers
 
 
             //第二节点
-            XmlElement xmlChild = xmlDocument.CreateElement("data2"); 
+            XmlElement xmlChild = xmlDocument.CreateElement("data2");
             //第二子节点
             XmlElement xmlElementInner = xmlDocument.CreateElement("root");
             XmlAttribute xmlAttribute = xmlDocument.CreateAttribute("我是键");

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<items name="01">
+		<item  Key="key1" value="value1" />
+		<item  Key="key2" value="value2" />
+		<item  Key="key3" value="value3" /> 
+	</items>
+	<items name="02">
+    <item  Key="key21" value="value21" />
+    <item  Key="key22" value="value22" />
+    <item  Key="key23" value="value23" />
+  </items>
+	<items name="03">
+    <item  Key="key31" value="value31" />
+    <item  Key="key32" value="value32" />
+    <item  Key="key33" value="value33" />
+  </items>
+
+
+</root>
