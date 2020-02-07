@@ -47,7 +47,7 @@ namespace WebApplication1.Controllers
         }
 
 
-        #region 修改中内容
+        #region 凑够mysql中获取xml内容
 
         //创建command对象      
         private MySqlCommand cmd = null;
@@ -59,17 +59,79 @@ namespace WebApplication1.Controllers
 
         public void readSql()
         {
-            conn = new MySqlConnection(connstr);
-            //需要读取的字段
-            List<string> ReadField = new List<string>();
-
+            string WhereSql = "'ZB01','ZB87','ZB03','ZB03','ZB04','GB2261','GB3304','GB2261D','GB4762','GB4762','GB4762','ZB125','ZB126','ZB130','XZ93','ZB09','ZB148','ZB134','ZB135','ZB139','ZB129','ZB122','ZB14','ZB09','ZB133','ZB14','GB8561','ZB24','ZB64','GB6864','GB16835','ZB123','ZB65','ZB67'," +
+                "'ZB03','ZB09','ZB128','ZB18','GB4761','GB4762'";
+             
+            conn = new MySqlConnection(connstr); 
             //从数据库读取字段
             MySqlDataReader reader = null;
-            string SQLStr = string.Format("SELECT CODE_TYPE,CODE_NAME,CODE_VALUE,CODE_NAME2,CODE_NAME3 FROM code_value WHERE CODE_TYPE IN ('ZB79','ZB75')");
+            string SQLStr = string.Format("SELECT CODE_TYPE,CODE_NAME,CODE_VALUE,CODE_NAME2,CODE_NAME3 FROM code_value WHERE CODE_TYPE IN ({0})", WhereSql);
+            //获取数据
+            List<code_value> ListData = realsql.QueryExecute(SQLStr); 
+            #region  //操作excel
 
-            var tt = realsql.QueryExecute(SQLStr);
-            var ts = "";
+            XmlDocument xmlDocument = new XmlDocument();
+            xmlDocument.AppendChild(xmlDocument.CreateXmlDeclaration("1.0", "UTF-8", null));
 
+            //第一节点
+            XmlElement xmlRoot = xmlDocument.CreateElement("root");
+            xmlDocument.AppendChild(xmlRoot);
+
+
+            //第一次创建的二级节点
+            string Second = "";
+            string Contrast = "";
+            XmlElement xmlChild = null;
+            foreach (var item in ListData)
+            {
+              
+                Second = item.CODE_TYPE;
+                if (Second != Contrast)
+                {
+                    //第二节点
+                    xmlChild = xmlDocument.CreateElement("items");
+                    XmlAttribute xmlChildKey = xmlDocument.CreateAttribute("name");
+                    xmlChildKey.Value = item.CODE_TYPE;//总标题
+                    xmlChild.Attributes.SetNamedItem(xmlChildKey);
+                    Contrast = item.CODE_TYPE;
+                }
+
+                //第二子节点
+                XmlElement xmlElementInner = xmlDocument.CreateElement("item");
+                //第二子节点 key key值
+                XmlAttribute node1 = xmlDocument.CreateAttribute("key");
+                node1.Value = item.CODE_TYPE;
+                xmlElementInner.Attributes.SetNamedItem(node1);
+                xmlChild.AppendChild(xmlElementInner);
+
+                //第二子节点 键1  value值
+                XmlAttribute node2 = xmlDocument.CreateAttribute("value");
+                node2.Value = item.CODE_NAME;
+                xmlElementInner.Attributes.SetNamedItem(node2);
+                xmlChild.AppendChild(xmlElementInner);
+
+
+                //第三子节点 键2  value值
+                XmlAttribute node3 = xmlDocument.CreateAttribute("value2");
+                node3.Value = item.CODE_NAME2;
+                xmlElementInner.Attributes.SetNamedItem(node3);
+                xmlChild.AppendChild(xmlElementInner);
+
+
+                //第四子节点 键3  value值
+                XmlAttribute node4 = xmlDocument.CreateAttribute("value3");
+                node4.Value = item.CODE_NAME3;
+                xmlElementInner.Attributes.SetNamedItem(node4);
+                xmlChild.AppendChild(xmlElementInner);
+
+                xmlRoot.AppendChild(xmlChild);
+            }
+
+            xmlDocument.Save(@"K:\Getxml.xml");
+            #endregion
+
+
+            string ts = "测试点";
         }
 
 

@@ -14,7 +14,7 @@ namespace WebApplication1.Models
     public class realsql
     {
 
-        public static IList<code_value> QueryExecute(string sql)
+        public static List<code_value> QueryExecute(string sql)
         {
              
             //var daset = DbHelperMySQL.Query(strSql.ToString());
