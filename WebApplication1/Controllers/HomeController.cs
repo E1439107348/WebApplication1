@@ -2,14 +2,14 @@
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
 using WebApplication1.Models;
+
+
 
 namespace WebApplication1.Controllers
 {
@@ -21,7 +21,7 @@ namespace WebApplication1.Controllers
         public ActionResult Index()
         {
 
-            readSql();
+            GetImages(@"G:\壁纸s\TsImageDel");
             return View();
             //string TorepotFiles = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\按机构导出文件_C59.F19.P11_浙江省人民政府20200119100455.zip";
             //string reportPath = @"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\备份\新建文件夹";
@@ -47,7 +47,7 @@ namespace WebApplication1.Controllers
         }
 
 
-        #region 凑够mysql中获取xml内容
+        #region  0.mysql中获取xml内容
 
         //创建command对象      
         private MySqlCommand cmd = null;
@@ -61,13 +61,13 @@ namespace WebApplication1.Controllers
         {
             string WhereSql = "'ZB01','ZB87','ZB03','ZB03','ZB04','GB2261','GB3304','GB2261D','GB4762','GB4762','GB4762','ZB125','ZB126','ZB130','XZ93','ZB09','ZB148','ZB134','ZB135','ZB139','ZB129','ZB122','ZB14','ZB09','ZB133','ZB14','GB8561','ZB24','ZB64','GB6864','GB16835','ZB123','ZB65','ZB67'," +
                 "'ZB03','ZB09','ZB128','ZB18','GB4761','GB4762'";
-             
-            conn = new MySqlConnection(connstr); 
+
+            conn = new MySqlConnection(connstr);
             //从数据库读取字段
             MySqlDataReader reader = null;
             string SQLStr = string.Format("SELECT CODE_TYPE,CODE_NAME,CODE_VALUE,CODE_NAME2,CODE_NAME3 FROM code_value WHERE CODE_TYPE IN ({0})", WhereSql);
             //获取数据
-            List<code_value> ListData = realsql.QueryExecute(SQLStr); 
+            List<code_value> ListData = realsql.QueryExecute(SQLStr);
             #region  //操作excel
 
             XmlDocument xmlDocument = new XmlDocument();
@@ -84,7 +84,7 @@ namespace WebApplication1.Controllers
             XmlElement xmlChild = null;
             foreach (var item in ListData)
             {
-              
+
                 Second = item.CODE_TYPE;
                 if (Second != Contrast)
                 {
@@ -100,7 +100,7 @@ namespace WebApplication1.Controllers
                 XmlElement xmlElementInner = xmlDocument.CreateElement("item");
                 //第二子节点 key key值
                 XmlAttribute node1 = xmlDocument.CreateAttribute("key");
-                node1.Value = item.CODE_TYPE;
+                node1.Value = item.CODE_VALUE;
                 xmlElementInner.Attributes.SetNamedItem(node1);
                 xmlChild.AppendChild(xmlElementInner);
 
@@ -138,10 +138,6 @@ namespace WebApplication1.Controllers
 
         #endregion
 
-
-
-
-
         #region 1.读写xml
 
         /// <summary>
@@ -150,10 +146,20 @@ namespace WebApplication1.Controllers
         public void ReadXml()
         {
             //读取xml文件
-            XmlTextReader xmlRd = new XmlTextReader(@"C:\Users\14391\Downloads\按机构导出文件_C59.F19.P11_浙江省人民政府20200116113952\Table\B01.xml");
+            XmlTextReader xmlRd = new XmlTextReader(@"G:\syxWork\工作使用到的文件等等\2020-1-16任务\xml导入导出\02.重要文件\按机构导出文件_C59.F19.P11_浙江省人民政府20200209102708\Table\A02.xml");
             var xml = XDocument.Load(xmlRd);
             var ts = xml.Root.Elements("data").Elements("row");//.First(x => x.Attribute("name").Value == "群众").Attribute("id").Value; 
-            var ts22 = ts.Attributes("B0104").First().Value;
+
+
+
+            List<string> lts = new List<string>();
+            var getList = ts.ToList();
+            foreach (var item in getList)
+            {
+                string getStr = item.Attributes("A0272").First().Value;
+                lts.Add(getStr);
+            }
+
         }
 
 
@@ -302,9 +308,6 @@ namespace WebApplication1.Controllers
         }
         #endregion
 
-
-
-
         #region 2.对压缩文件操作
         /// <summary>
         /// 解压文件 1.01
@@ -371,7 +374,121 @@ namespace WebApplication1.Controllers
         #endregion
 
 
+        #region 3.获取文件中的图片
 
+
+        public void die(string path)
+        {
+            string url = "", fileName = "";
+            DirectoryInfo di = new DirectoryInfo(path);
+            FileInfo[] files = di.GetFiles();
+            fileName = files[0].Name.ToLower();//因为图片只有一张 这里就字节使用  files[0].Name.ToLower();
+            if (fileName.EndsWith(".png") || fileName.EndsWith(".jpg") || fileName.EndsWith(".jpeg"))
+            {
+                url = path + @"\" + fileName.ToString();
+            }
+        }
+        /// <summary>
+        /// 获取多种图片
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        public void GetImages(string filePath)
+        {
+            // GetImages(@"G:\壁纸s\TsImageDel");
+            DirectoryInfo di = new DirectoryInfo(filePath);
+            FileInfo[] files = di.GetFiles();
+            string fileName;
+            List<string> list = new List<string>();
+            for (int i = 0; i < files.Length; i++)
+            {
+                fileName = files[i].Name.ToLower();
+                if (fileName.EndsWith(".png") || fileName.EndsWith(".jpg") || fileName.EndsWith(".jpeg"))
+                {
+                    list.Add(fileName);
+                }
+            }
+
+        }
+
+        public void GetImage(string path)
+        {
+            // GetImage(@"G:\壁纸s\TsImageDel");
+            //  string path = Server.MapPath("img");//获取img文件夹的路径 
+
+            DirectoryInfo di = new DirectoryInfo(path);
+            string[] GetFile = new string[] { "*.jpg", "*.png", "*.jpeg" };
+            //   di.GetFiles(["","",""]);
+
+            var getx = di.GetFiles("*.jpg");//只获取jpg图片 
+
+            string url = path + @"\" + getx[0].ToString(); ;
+            var imagegByteArr = ChangeStreamToByteArr(url);
+            string imagestr = Convert.ToBase64String(imagegByteArr);
+
+            var get = di.GetFiles();//获取文件夹下所有的文件 
+
+        }
+        public static byte[] ChangeStreamToByteArr(string relativePath)
+        {
+            string filePath = GetAbsolutePath(relativePath);
+            using (Stream input = GetFileStreamByPath(filePath))
+            {
+                return ChangeStreamToByteArr(input);
+            }
+        }
+        public static byte[] ChangeStreamToByteArr(Stream input)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            using (MemoryStream ms = new MemoryStream())
+            {
+                int read;
+                while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, read);
+                }
+                return ms.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// 获取文件的绝对路径,针对window程序和web程序都可使用
+        /// </summary>
+        /// <param name="relativePath">相对路径地址</param>
+        /// <returns>绝对路径地址</returns>
+        public static string GetAbsolutePath(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                throw new ArgumentNullException("参数relativePath空异常！");
+            }
+            relativePath = relativePath.Replace("/", "\\");
+            if (relativePath[0] == '\\')
+            {
+                relativePath = relativePath.Remove(0, 1);
+            }
+            //判断是Web程序还是window程序
+            //if (HttpContext.Current != null)
+            //{
+            //    return Path.Combine(HttpRuntime.AppDomainAppPath, relativePath);
+            //}
+            //else
+            //{
+            //    return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativePath);
+            //}
+
+
+            return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativePath);
+
+        }
+
+
+        public static Stream GetFileStreamByPath(string path)
+        {
+            Stream stream = System.IO.File.Open(path, FileMode.OpenOrCreate);
+            return stream;
+        }
+        #endregion
 
 
 
